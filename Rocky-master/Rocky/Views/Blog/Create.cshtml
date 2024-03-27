@@ -1,0 +1,96 @@
+﻿@model Rocky_Models.ViewModels.PostVM
+
+<form method="post" asp-action="Create" enctype="multipart/form-data">
+    <div class="border p-3 bg-white">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group row">
+            <h2 class="text-info pl-3">Add Post</h2>
+        </div>
+        <div class="row">
+            <div class="col-8">
+                <div class="form-group row py-2">
+                    <div class="col-4">
+                        <label asp-for="Post.Title"></label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="Post.Title" class="form-control" />
+                        <span asp-validation-for="Post.Title" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Post.Text"></label>
+                    </div>
+                    <div class="col-8">
+                        <textarea asp-for="Post.Text" class="form-control summernote"></textarea>
+                        <span asp-validation-for="Post.Text" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Post.ShortText"></label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="Post.ShortText" class="form-control" />
+                        <span asp-validation-for="Post.ShortText" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Post.Type"></label>
+                    </div>
+                    <div class="col-8">
+                        <select asp-for="Post.Type" asp-items="@Model.Type" class="form-select">
+                            <option disabled selected>--Select Type--</option>
+                        </select>
+                        <span asp-validation-for="Post.Type" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-4">
+                        Image
+                    </div>
+                    <div class="col-8">
+                        <input type="file" name="files" id="uploadBox1" multiple class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group row py-2">
+                    <div class="col-8 offset-4 row">
+
+                        <div class="col">
+                            <input type="submit" class="btn btn-info w-100" value="Create" />
+                        </div>
+                        <div class="col">
+                            <a asp-action="Index" class="btn btn-success w-100"><i class="fas fa-sign-out-alt"></i> Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+    <script>
+        $(document).ready(function () {
+            $('.summernote').summernote({
+                height: 250
+            });
+        });
+        function validateInput() {
+            if (document.getElementById("uploadBox1").value == "") {
+                Swal.fire(
+                    'Error!',
+                    'Please upload an Image!',
+                    'error'
+                )
+                return false;
+            }
+            return true;
+        }
+    </script>
+}

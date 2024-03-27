@@ -1,0 +1,207 @@
+﻿@using Rocky.Services
+@using Rocky_Utility
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model Rocky_Models.ViewModels.ProductUserVM
+@inject IUserService _userService
+
+<form method="post" id="payment-form">
+    <br />
+    <div class="backgroundWhiteBorder">
+        <div class="container">
+            <div class="card">
+                <div class="card-header bg-dark text-light ml-0 row container">
+                    <div class="col-6">
+                        <i class="fa fa-shopping-cart"></i> &nbsp;
+                        Order Summary
+                    </div>
+                    <div class="col-6 text-right">
+                        <a class="btn btn-outline-info btn-sm" asp-action="Index">Back to Cart</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="container rounded p-2">
+                        <div class="row">
+                            <div class="col-12 col-lg-7 pb-4">
+                                <div class="row">
+                                    <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="text-info">User Details:</span>
+                                    </h4>
+                                </div>
+                                <div class="row my-1">
+                                    <div class="col-3">
+                                        <label>Name</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <input asp-for="ApplicationUser.FullName" type="text" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="row my-1">
+                                    <div class="col-3">
+                                        <label>Phone</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <input asp-for="ApplicationUser.PhoneNumber" required type="text" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="row my-1">
+                                    <div class="col-3">
+                                        <label>Email</label>
+                                    </div>
+                                    <div class="col-9">
+                                        <input asp-for="ApplicationUser.Email" required type="text" class="form-control" />
+                                    </div>
+                                </div>
+                                @if (_userService.IsInRole(WC.AdminRole))
+                                {
+
+                                    <div class="row my-1">
+                                        <div class="col-3">
+                                            <label>Address</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input asp-for="ApplicationUser.StreetAddress" type="text" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row my-1">
+                                        <div class="col-3">
+                                            <label>City</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input asp-for="ApplicationUser.City" type="text" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row my-1">
+                                        <div class="col-3">
+                                            <label>State</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input asp-for="ApplicationUser.State" type="text" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row my-1">
+                                        <div class="col-3">
+                                            <label>Postal Code</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input asp-for="ApplicationUser.PostalCode" type="text" class="form-control" />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-12 col-lg-5 row">
+                                <div class="col-12">
+                                    <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="text-info">Summary:</span>
+                                    </h4>
+                                    <ul class="list-group mb-3">
+                                        @{
+                                            var orderTotal = 0.0;
+                                        }
+
+                                        @for (int i = 0; i < Model.ProductsList.Count(); i++)
+                                        {
+                                            <input type="hidden" asp-for="@Model.ProductsList[i].Id" />
+                                            <input type="hidden" asp-for="@Model.ProductsList[i].Name" />
+                                            <input type="hidden" asp-for="@Model.ProductsList[i].Price" />
+                                            <input type="hidden" asp-for="@Model.ProductsList[i].TempSqFt" />
+                                            <li class="list-group-item d-flex justify-content-between">
+                                                <div>
+                                                    <h6 class="my-0">@Model.ProductsList[i].Name</h6>
+                                                    @if (_userService.IsInRole(WC.AdminRole))
+                                                    {
+                                                        <small class="text-muted">Weight: @Model.ProductsList[i].TempSqFt</small>
+                                                    }
+                                                    else
+                                                    {
+                                                        <small class="text-muted">Price: $@Model.ProductsList[i].Price</small>
+                                                    }
+                                                </div>
+                                                @if (_userService.IsInRole(WC.AdminRole))
+                                                {
+                                                    <span class="text-muted">$@(Model.ProductsList[i].Price * Model.ProductsList[i].TempSqFt)</span>
+                                                }
+                                            </li>
+                                            orderTotal += Model.ProductsList[i].Price * Model.ProductsList[i].TempSqFt;
+                                        }
+                                        @if (_userService.IsInRole(WC.AdminRole))
+                                        {
+                                            <li class="list-group-item d-flex justify-content-between bg-light">
+                                                <small class="text-info"> Total (USD)</small>
+                                                <strong class="text-info">$@orderTotal</strong>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-12 col-md-5 offset-md-7">
+                            @if (_userService.IsInRole(WC.AdminRole))
+                            {
+                                <button class="btn btn-success form-control" onclick="validateInput()" id="submit-button">Submit Order</button>
+                            }
+                            else
+                            {
+                                <button type="submit" onclick="validateInput()" class="btn btn-primary form-control">Submit Inquiry</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://js.braintreegateway.com/web/dropin/1.22.1/js/dropin.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+
+            function validateInput() {
+                var app_name = document.getElementById("ApplicationUser_FullName").value;
+                var app_phone = document.getElementById("ApplicationUser_PhoneNumber").value;
+                var app_email = document.getElementById("ApplicationUser_Email").value;
+
+                if (app_name.trim() === '') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Please enter Full Name!'
+                    });
+                    return false;
+                }
+
+                if (app_phone.trim() === '') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Please enter Phone Number!'
+                    });
+                    return false;
+                }
+
+                if (app_email.trim() === '') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Please enter Email!'
+                    });
+                    return false;
+                }
+
+                return true;
+            }
+        });
+    
+    </script>
+}
+
+

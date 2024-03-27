@@ -1,0 +1,87 @@
+﻿@model IEnumerable<Rocky_Models.Models.Post>
+@using Rocky_Utility;
+@using Rocky.Services
+@inject IUserService _userService
+<link href="~/css/blog.css" rel="stylesheet"/>
+
+<div class="container">
+    @if (_userService.IsInRole(WC.AdminRole))
+    {
+        <div class="row mt-4">
+            <div class="col">
+                <a asp-controller="Blog" asp-action="Create" class="btn btn-primary">Add post</a>
+            </div>
+        </div>
+    }
+
+    <div class="row mb-4 mt-4">
+        <div class="col">
+            <form method="get" action="@Url.Action("Index", "Blog")">
+                <div class="input-group">
+                    <input type="text" name="searchTerm" class="form-control" placeholder="Search by name or type">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row row-cols-2">
+        @foreach (var post in Model)
+        {
+            <div class="col">
+                <div class="card">
+                    <a href="@Url.Action("Details", "Blog", new { id = post.Id })">
+                        <img class="card-img-top" src="@WC.ImagePathPosts@post.Image" alt="Post Image">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">@post.Title</h5>
+                        <p class="card-text">@post.ShortText</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <form method="post" action="@Url.Action("Like", "Blog")">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Id" value="@post.Id" />
+                                <button type="submit" class="btn btn-link like-button">
+                                    <i class="like-icon fas fa-heart"></i>
+                                    <span class="like-count text-danger">@post.Count</span>
+                                </button>
+                            </form>
+                            <button class="btn btn-link share-button" onclick="copyToClipboard('@Url.Action("Details", "Blog", new { id = post.Id })')">
+                                <i class="share-icon fas fa-share-alt"></i>
+                            </button>
+                        </div>
+                        <div class="post-details">
+                            <span>Author: @post.ApplicationUser.FullName</span>
+                            <span>Publication date: @post.CreatedDate.ToString("dd.MM.yyyy")</span>
+                            <span>Type: @post.Type</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    function copyToClipboard(relativePath) {
+        var basePath = window.location.origin;
+        var fullPath = basePath + relativePath;
+
+        var tempTextArea = document.createElement("textarea");
+        tempTextArea.value = fullPath;
+
+        document.body.appendChild(tempTextArea);
+
+        tempTextArea.select();
+        document.execCommand("copy");
+
+        document.body.removeChild(tempTextArea);
+        alert("Link copied to clipboard!!");
+    }
+</script>
+
+
+
+
+
+

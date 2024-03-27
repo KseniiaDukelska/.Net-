@@ -1,0 +1,46 @@
+﻿@model Rocky_Models.Models.Post
+@using Rocky_Utility
+@using Rocky.Services
+@inject IUserService _userService
+<link href="~/css/blog.css" rel="stylesheet" />
+
+
+<div class="post-container">
+    <div class="post-content">
+        <div class="post-image">
+            <img src="@WC.ImagePathPosts@Model.Image" alt="Post Image">
+        </div>
+        <div class="post-text">
+            <h2 class="post-title">@Model.Title</h2>
+            <div>@Model.ShortText</div>
+        </div>
+    </div>
+    <div class="post-info">
+        <span class="post-author">Created by: @Model.ApplicationUser.FullName</span>
+        <span class="post-date">Created on: @Model.CreatedDate.ToString("yyyy-MM-dd")</span>
+    </div>
+    <div class="post-actions">
+        <span class="like-count">Like Count: @Model.Count</span>
+        <form method="post" action="@Url.Action("Like", "Blog")">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" value="@Model.Id" />
+            <button type="submit" class="like-button">
+                <i class="like-icon fas fa-heart"></i>
+            </button>
+        </form>
+        @if (_userService.IsInRole(WC.AdminRole))
+        {
+            <a asp-controller="Blog" asp-action="Edit" asp-route-Id="@Model.Id" class="btn btn-primary mx-2">
+                <i class="fas fa-edit"></i>
+            </a>
+            <a asp-controller="Blog" asp-action="Delete" asp-route-Id="@Model.Id" class="btn btn-danger mx-2">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        }
+    </div>
+    <div class="main-text">
+        @Html.Raw(Model.Text)
+    </div>
+</div>
+
+

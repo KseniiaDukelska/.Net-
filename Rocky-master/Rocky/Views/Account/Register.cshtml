@@ -1,0 +1,83 @@
+﻿@using Rocky_Utility
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Rocky.Services
+@inject IUserService _userService
+@model Rocky_Models.ViewModels.RegistrationVM
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="py-4">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="row form-group">
+        <div class="col-8 offset-2">
+            <div class="card">
+                <div class="card-body px-lg-5 pt-4">
+                    <form asp-controller="Account" asp-action="Register" method="post">
+                        <h3 class="col-12 text-success text-center py-4">
+                            @if (_userService.IsInRole(WC.AdminRole))
+                            {
+                                <strong>Register an Admin Account</strong>
+                            }
+                            else
+                            {
+                                <strong>Register</strong>
+                            }
+                        </h3>
+                        <hr />
+                        <div class="py-2">
+                            <input asp-for="FullName" placeholder="Name" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="py-2">
+                            <input asp-for="Email" placeholder="Email" type="email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="py-2">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">+380</span>
+                                </div>
+                                <input asp-for="PhoneNumber" placeholder="Phone Number" type="text" class="form-control" />
+                            </div>
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-row row py-2">
+                            <div class="col-6">
+                                <input asp-for="Password" placeholder="Password" type="password" class="form-control" />
+                            </div>
+                            <div class="col-6">
+                                <input asp-for="ConfirmPassword" placeholder="Confirm Password" type="password" class="form-control" />
+
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+                        <div class="py-2">
+                            @if (_userService.IsInRole(WC.AdminRole))
+                            {
+                                <button type="submit" class="btn btn-warning form-control">Register Admin User</button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-primary form-control">Register</button>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial"/>
+}
