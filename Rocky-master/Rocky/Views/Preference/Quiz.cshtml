@@ -1,0 +1,23 @@
+﻿@model IEnumerable<Rocky_Models.Models.Category>
+
+@{
+    ViewData["Title"] = "Preference Quiz";
+}
+
+<h2>Select Your Preferred Categories</h2>
+
+<form asp-action="SavePreferences" method="post">
+    @Html.AntiForgeryToken()
+    <div>
+        @foreach (var category in Model)
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="categoryIds" value="@category.Id" id="category_@category.Id">
+                <label class="form-check-label" for="category_@category.Id">
+                    @category.Name
+                </label>
+            </div>
+        }
+    </div>
+    <button type="submit" class="btn btn-primary">Save Preferences</button>
+</form>

@@ -10,11 +10,35 @@
             </button>
         }
     </div>
-    <br/>
+
+    <br />
+
+    <!-- Display User Preferences -->
+    <div class="text-center">
+        <h3>Your Preferred Categories</h3>
+        @if (Model.UserPreferences != null && Model.UserPreferences.Any())
+        {
+            <div class="d-flex flex-wrap justify-content-center">
+                @foreach (var pref in Model.UserPreferences)
+                {
+                    <div class="bg-light border rounded p-2 m-2" style="width: 200px;">
+                        <p class="m-0">@pref.Name</p>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p>You have not set any preferences yet.</p>
+        }
+    </div>
+
+    <br />
+
     <div class="row">
         @foreach (var prod in Model.Products)
         {
-            <partial name="_IndividualProductCard" model="prod"/>
+            <partial name="_IndividualProductCard" model="prod" />
         }
     </div>
 </div>
@@ -22,20 +46,17 @@
 @section Scripts
 {
     <script>
-        $(document).ready(function(){
+        $(document).ready(function () {
 
-            $(".filter-button").click(function(){
+            $(".filter-button").click(function () {
 
                 var value = $(this).attr('data-filter');
-                if(value == "all")
-                {
+                if (value == "all") {
                     $('.filter').show('1000');
                 }
-                else
-                {
-                    $(".filter").not('.'+value).hide('3000');
-                    $('.filter').filter('.'+value).show('3000');
-            
+                else {
+                    $(".filter").not('.' + value).hide('3000');
+                    $('.filter').filter('.' + value).show('3000');
                 }
             });
 

@@ -6,6 +6,7 @@ using Rocky_Utility;
 using Rocky_DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Rocky.Infrastructure;
+using Rocky.Services;
 
 namespace Rocky.Controllers
 {
@@ -14,6 +15,8 @@ namespace Rocky.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IUserInteractionService _userInteractionService;
+
         public ProductController(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment)
         {
             _productRepository = productRepository;
@@ -149,6 +152,28 @@ namespace Rocky.Controllers
 
             TempData[WC.Success] = "Action completed successfully";
             return RedirectToAction("Index");
+        }
+
+        // new controllers
+
+        public IActionResult Details(int id)
+        {
+            var product = _productRepository.FirstOrDefault(p => p.Id == id, includeProperties: "Category");
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            // Log the interaction
+            var interaction = new UserInteraction
+            {
+                UserId = User.GetUserId(), // Assuming you have a method to get the current user's ID
+                ProductId = product.Id,
+                InteractionType = "view"
+            };
+            _userInteractionService.LogInteraction(interaction);
+
+            return View(product);
         }
     }
 }

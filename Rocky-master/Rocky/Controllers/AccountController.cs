@@ -7,6 +7,7 @@ using Rocky_Models.ViewModels;
 using Rocky_Utility;
 using Syncfusion.EJ2.DropDowns;
 using Syncfusion.EJ2.FileManager;
+using System.Threading.Tasks;
 
 namespace Rocky.Controllers
 {
@@ -15,12 +16,14 @@ namespace Rocky.Controllers
         private readonly IApplicationUserRepository _userRepository;
         private readonly IRoleRepository _roleRepository;
         private readonly IUserService _userService;
+        private readonly IUserPreferenceService _userPreferenceService;
 
-        public AccountController(IApplicationUserRepository userRepository, IRoleRepository roleRepository, IUserService userService)
+        public AccountController(IApplicationUserRepository userRepository, IRoleRepository roleRepository, IUserService userService, IUserPreferenceService userPreferenceService)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
             _userService = userService;
+            _userPreferenceService = userPreferenceService;
         }
 
         public IActionResult Register()
@@ -77,7 +80,7 @@ namespace Rocky.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = _userRepository.FirstOrDefault(u => u.Email == model.Email,"Role");
+                var user = _userRepository.FirstOrDefault(u => u.Email == model.Email, "Role");
 
                 if (user == null)
                 {
@@ -87,15 +90,23 @@ namespace Rocky.Controllers
 
                 if (model.Password != user.Password)
                 {
-                    ModelState.AddModelError("CheckError","Wrong password!");
+                    ModelState.AddModelError("CheckError", "Wrong password!");
                     return View(model);
                 }
 
                 await _userService.LoginAsync(user);
 
+                // Check if the user has completed the preference quiz
+                int userId = user.Id;  // No need to parse since it's already an int
+                if (!_userPreferenceService.HasPreferences(userId))
+                {
+                    return RedirectToAction("Quiz", "Preference");
+                }
+
 
                 return RedirectToAction("Index", "Home");
             }
+
 
             return View(model);
         }
@@ -110,6 +121,5 @@ namespace Rocky.Controllers
 
             return RedirectToAction("Login", "Account");
         }
-
     }
 }

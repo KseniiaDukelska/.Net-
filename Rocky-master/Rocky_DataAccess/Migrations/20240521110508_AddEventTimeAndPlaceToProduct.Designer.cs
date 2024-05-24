@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rocky_DataAccess;
 
@@ -11,9 +12,11 @@ using Rocky_DataAccess;
 namespace Rocky_DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240521110508_AddEventTimeAndPlaceToProduct")]
+    partial class AddEventTimeAndPlaceToProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -353,55 +356,6 @@ namespace Rocky_DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Role");
-                });
-
-            modelBuilder.Entity("Rocky_Models.Models.UserInteraction", b =>
-                {
-                    b.Property<int>("InteractionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InteractionId"));
-
-                    b.Property<DateTime>("InteractionTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("InteractionType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<float?>("InteractionValue")
-                        .HasColumnType("real");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("InteractionId");
-
-                    b.ToTable("UserInteractions");
-                });
-
-            modelBuilder.Entity("Rocky_Models.Models.UserPreference", b =>
-                {
-                    b.Property<int>("PreferenceId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PreferenceId"));
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PreferenceId");
-
-                    b.ToTable("UserPreferences");
                 });
 
             modelBuilder.Entity("Rocky_Models.Models.ApplicationUser", b =>

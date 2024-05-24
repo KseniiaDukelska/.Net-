@@ -32,5 +32,12 @@ namespace Rocky_Models.Models
         public int CategoryId { get; set; }
         [ForeignKey("CategoryId")]
         public Category Category { get; set; }
+
+        // New properties
+        [Display(Name = "Event Time")]
+        public DateTime EventTime { get; set; }
+
+        [Display(Name = "Place")]
+        public string Place { get; set; }
     }
 }

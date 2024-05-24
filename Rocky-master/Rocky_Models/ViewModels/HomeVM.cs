@@ -6,5 +6,6 @@ namespace Rocky_Models.ViewModels
     {
         public IEnumerable<Product> Products { get; set; }
         public IEnumerable<Category> Categories { get; set; }
+        public List<Category> UserPreferences { get; set; }
     }
 }

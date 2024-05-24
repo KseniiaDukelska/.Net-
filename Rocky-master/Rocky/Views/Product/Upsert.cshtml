@@ -2,13 +2,13 @@
 @using Rocky_Utility
 
 @{ 
-    var title = "Create Product";
+    var title = "Create Event";
 }
 
 <form method="post" enctype="multipart/form-data">
     @if (Model.Product.Id != 0)
     {
-        title = "Edit Product";
+        title = "Edit Event";
         <input asp-for="Product.Id" hidden />
     }
     <div class="border p-3">
@@ -45,6 +45,28 @@
                         <span asp-validation-for="Product.ShortDesc" class="text-danger"></span>
                     </div>
                 </div>
+
+                <!-- New fields for EventTime and Place -->
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Product.EventTime"></label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="Product.EventTime" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="Product.EventTime" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Product.Place"></label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="Product.Place" class="form-control" />
+                        <span asp-validation-for="Product.Place" class="text-danger"></span>
+                    </div>
+                </div>
+                <!-- End of new fields -->
+
                 <div class="form-group row">
                     <div class="col-4">
                         <label asp-for="Product.Description"></label>

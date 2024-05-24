@@ -72,7 +72,7 @@ namespace Rocky.Services
 
                 return isInRole;
             }
-            catch (UnauthorizedAccessException e)
+            catch (UnauthorizedAccessException)
             {
                 return false;
             }
@@ -81,11 +81,10 @@ namespace Rocky.Services
         public int GetUserId()
         {
             var claims = GetUserClaimsFromCookie();
-
             var userId = Int32.Parse(claims.First(c => c.Key == ClaimTypes.NameIdentifier).Value);
-
             return userId;
         }
+
 
         private async Task Authenticate(ApplicationUser user)
         {
@@ -106,7 +105,7 @@ namespace Rocky.Services
 
         private Dictionary<string, string> GetUserClaimsFromCookie()
         {
-            _accessor.HttpContext.Request.Cookies.TryGetValue(WC.UserCookie, out string jsonClaims);
+           _accessor.HttpContext.Request.Cookies.TryGetValue(WC.UserCookie, out string jsonClaims);
 
             if (string.IsNullOrEmpty(jsonClaims))
                 throw new UnauthorizedAccessException("User unauthorized");

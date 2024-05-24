@@ -3,6 +3,7 @@ using Rocky_Models.Models;
 using Rocky_Models.ViewModels;
 using Rocky_Utility;
 using Rocky_DataAccess.Repository.IRepository;
+using Rocky.Services;
 
 namespace Rocky.Controllers
 {
@@ -11,12 +12,17 @@ namespace Rocky.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IUserService _userService;
+        private readonly IUserPreferenceService _userPreferenceService;
 
-        public HomeController(ILogger<HomeController> logger, IProductRepository productRepository, ICategoryRepository categoryRepository)
+        public HomeController(ILogger<HomeController> logger, IProductRepository productRepository, ICategoryRepository categoryRepository, IUserService userService,
+            IUserPreferenceService userPreferenceService)
         {
             _logger = logger;
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
+            _userService = userService;
+            _userPreferenceService = userPreferenceService;
         }
 
         public IActionResult Index()
@@ -26,6 +32,12 @@ namespace Rocky.Controllers
                 Products = _productRepository.GetAll(includeProperties: "Category"),
                 Categories = _categoryRepository.GetAll()
             };
+
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = User.GetUserId(); // Use the extension method to get the current user's ID
+                homeVm.UserPreferences = _userPreferenceService.GetUserPreferences(userId);
+            }
 
             return View(homeVm);
         }

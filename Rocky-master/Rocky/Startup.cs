@@ -57,6 +57,12 @@ namespace Rocky
             services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<ILikeRepository, LikeRepository>();
+            services.AddScoped<IUserPreferenceRepository, UserPreferenceRepository>();
+
+
+            // Register the new services
+            services.AddScoped<IUserInteractionService, UserInteractionService>();
+            services.AddScoped<IUserPreferenceService, UserPreferenceService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -88,6 +94,9 @@ namespace Rocky
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                // Add this line to map API controllers
+                endpoints.MapControllers();
             });
         }
     }
