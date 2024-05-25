@@ -22,20 +22,28 @@ namespace Rocky.Services
 
         public void SavePreferences(int userId, List<int> categoryIds)
         {
-            var existingPreferences = _db.UserPreferences.Where(up => up.UserId == userId);
-            _db.UserPreferences.RemoveRange(existingPreferences);
-
-            foreach (var categoryId in categoryIds)
+            try
             {
-                _db.UserPreferences.Add(new UserPreference
-                {
-                    UserId = userId,
-                    CategoryId = categoryId
-                });
-            }
+                var existingPreferences = _db.UserPreferences.Where(up => up.UserId == userId);
+                _db.UserPreferences.RemoveRange(existingPreferences);
 
-            _db.SaveChanges();
+                foreach (var categoryId in categoryIds)
+                {
+                    _db.UserPreferences.Add(new UserPreference
+                    {
+                        UserId = userId,
+                        CategoryId = categoryId
+                    });
+                }
+
+                _db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error saving preferences: {ex.Message}");
+            }
         }
+
 
         public bool HasPreferences(int userId)
         {

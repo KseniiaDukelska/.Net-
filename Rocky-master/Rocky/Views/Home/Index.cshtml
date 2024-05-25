@@ -13,25 +13,6 @@
 
     <br />
 
-    <!-- Display User Preferences -->
-    <div class="text-center">
-        <h3>Your Preferred Categories</h3>
-        @if (Model.UserPreferences != null && Model.UserPreferences.Any())
-        {
-            <div class="d-flex flex-wrap justify-content-center">
-                @foreach (var pref in Model.UserPreferences)
-                {
-                    <div class="bg-light border rounded p-2 m-2" style="width: 200px;">
-                        <p class="m-0">@pref.Name</p>
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <p>You have not set any preferences yet.</p>
-        }
-    </div>
 
     <br />
 

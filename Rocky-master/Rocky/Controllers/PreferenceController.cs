@@ -34,7 +34,7 @@ namespace Rocky.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 int userId = _userService.GetUserId();
-                System.Diagnostics.Debug.WriteLine($"Saving preferences for UserId: {userId}");
+                System.Diagnostics.Debug.WriteLine($"Saving preferences for UserId: {userId} with Categories: {string.Join(", ", categoryIds)}");
                 _userPreferenceService.SavePreferences(userId, categoryIds);
             }
             else

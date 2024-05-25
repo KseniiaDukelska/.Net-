@@ -1,18 +1,39 @@
 ﻿@using Rocky.Services
+@using Rocky_Models.Models
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @inject IUserService _userService
-
-
+@inject IUserPreferenceService _userPreferenceService
 
 <ul class="navbar-nav">
-
     @if (_userService.IsUserSignedIn())
     {
         <li class="nav-item">
             <a id="manage" class="nav-link" href="#" title="Manage">Hello @_userService.GetUserName()!</a>
         </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="preferencesDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Preferences
+            </a>
+            <div class="dropdown-menu" aria-labelledby="preferencesDropdown">
+                @{
+                    var userId = _userService.GetUserId();
+                    var preferences = _userPreferenceService.GetUserPreferences(userId);
+                }
+                @if (preferences != null && preferences.Any())
+                {
+                    @foreach (var preference in preferences)
+                    {
+                        <a class="dropdown-item" href="#">@preference.Name</a>
+                    }
+                }
+                else
+                {
+                    <a class="dropdown-item" href="#">No preferences set</a>
+                }
+            </div>
+        </li>
         <li class="nav-item">
-            <form asp-controller="Account" asp-action="Logout" id="logoutForm" class="form-inline" >
+            <form asp-controller="Account" asp-action="Logout" id="logoutForm" class="form-inline">
                 <button id="logout" type="submit" class="nav-link btn btn-link">Logout</button>
             </form>
         </li>
@@ -26,5 +47,4 @@
             <a class="nav-link" id="login" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
         </li>
     }
-        
 </ul>

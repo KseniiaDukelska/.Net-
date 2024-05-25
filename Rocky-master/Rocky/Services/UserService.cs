@@ -5,31 +5,29 @@ using Newtonsoft.Json;
 using Rocky_DataAccess.Repository.IRepository;
 using Rocky_Models.Models;
 using Rocky_Utility;
-
 namespace Rocky.Services
 {
     public class UserService : IUserService
     {
         private IHttpContextAccessor _accessor;
         private IApplicationUserRepository _repository;
-
         public UserService(IHttpContextAccessor accessor, IApplicationUserRepository repository)
         {
             _accessor = accessor;
             _repository = repository;
         }
-
         public async Task RegisterAsync(ApplicationUser user)
         {
             var isUserExist = _repository.FirstOrDefault(u => u.Email == user.Email || u.UserName == user.UserName);
 
             if (isUserExist != null)
             {
-                throw new Exception("User with this email or user name already exists");
+                throw new Exception("User with this email or user name already exist");
             }
 
             _repository.Add(user);
             _repository.Save();
+
 
             await Authenticate(user);
         }
@@ -38,60 +36,77 @@ namespace Rocky.Services
         {
             await Authenticate(user);
         }
-
         public Task LogoutAsync()
         {
             return Task.Run(() =>
             {
                 _accessor.HttpContext.Response.Cookies.Delete(WC.UserCookie);
-                _accessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             });
         }
 
         public bool IsUserSignedIn()
         {
-            return _accessor.HttpContext.User.Identity.IsAuthenticated;
+            return _accessor.HttpContext.Request.Cookies.ContainsKey(WC.UserCookie);
         }
 
         public string GetUserName()
         {
-            return _accessor.HttpContext.User.Identity.Name;
+            var claims = GetUserClaimsFromCookie();
+
+            var userName = claims.First(c => c.Key == ClaimsIdentity.DefaultNameClaimType).Value;
+
+            return userName;
         }
 
         public bool IsInRole(string roleName)
         {
-            return _accessor.HttpContext.User.IsInRole(roleName);
+            try
+            {
+                var claims = GetUserClaimsFromCookie();
+
+                var isInRole = claims.Any(c => c.Key == ClaimsIdentity.DefaultRoleClaimType && c.Value == roleName);
+
+                return isInRole;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return false;
+            }
         }
 
         public int GetUserId()
         {
-            var userIdClaim = _accessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userIdClaim == null)
-            {
-                throw new UnauthorizedAccessException("User ID claim not found.");
-            }
-
-            return int.Parse(userIdClaim);
+            var claims = GetUserClaimsFromCookie();
+            var userId = Int32.Parse(claims.First(c => c.Key == ClaimTypes.NameIdentifier).Value);
+            return userId;
         }
+
 
         private async Task Authenticate(ApplicationUser user)
         {
-            var claims = new List<Claim>
+            var claims = new Dictionary<string, string>()
             {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Role, user.Role.RoleName),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                { ClaimsIdentity.DefaultNameClaimType, user.UserName },
+                { ClaimsIdentity.DefaultRoleClaimType, user.Role.RoleName },
+                { ClaimTypes.NameIdentifier, user.Id.ToString() }
             };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var authProperties = new AuthenticationProperties
-            {
-                IsPersistent = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(1)
-            };
+            var jsonClaims = JsonConvert.SerializeObject(claims);
 
-            await _accessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity), authProperties);
+            _accessor.HttpContext.Response.Cookies.Append(WC.UserCookie, jsonClaims, new CookieOptions
+            {
+                Expires = (DateTimeOffset.Now.AddDays(2))
+            });
+        }
+
+        private Dictionary<string, string> GetUserClaimsFromCookie()
+        {
+            _accessor.HttpContext.Request.Cookies.TryGetValue(WC.UserCookie, out string jsonClaims);
+
+            if (string.IsNullOrEmpty(jsonClaims))
+                throw new UnauthorizedAccessException("User unauthorized");
+
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonClaims);
         }
     }
 }

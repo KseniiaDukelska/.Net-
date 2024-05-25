@@ -2,6 +2,7 @@
 @using Rocky.Services
 @inject IHttpContextAccessor HttpContextAccessor
 @inject IUserService _userService
+@inject IUserPreferenceService _userPreferenceService
 @using Rocky_Utility
 @using Rocky_Models.Models
 
@@ -34,10 +35,7 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <partial name="_LoginPartial" />
 
-
                     <ul class="navbar-nav flex-grow-1">
-
-
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
@@ -93,7 +91,7 @@
 
     <div class="container pb-5">
         <main role="main" class="pb-3">
-            <partial name="_Notifications"/>
+            <partial name="_Notifications" />
             @RenderBody()
         </main>
     </div>
