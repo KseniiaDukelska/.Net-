@@ -3,8 +3,6 @@ using Rocky_Models.Models;
 using Rocky_Models.ViewModels;
 using Rocky_Utility;
 using Rocky_DataAccess.Repository.IRepository;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Rocky.Infrastructure;
 using Rocky.Services;
 
 namespace Rocky.Controllers
@@ -13,11 +11,13 @@ namespace Rocky.Controllers
     {
         private readonly IUserPreferenceService _userPreferenceService;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IUserService _userService;
 
-        public PreferenceController(IUserPreferenceService userPreferenceService, ICategoryRepository categoryRepository)
+        public PreferenceController(IUserPreferenceService userPreferenceService, ICategoryRepository categoryRepository, IUserService userService)
         {
             _userPreferenceService = userPreferenceService;
             _categoryRepository = categoryRepository;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -31,12 +31,19 @@ namespace Rocky.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult SavePreferences(List<int> categoryIds)
         {
-            var userId = User.GetUserId(); // Use the extension method to get the current user's ID
-            System.Diagnostics.Debug.WriteLine($"Saving preferences for UserId: {userId}");
-            _userPreferenceService.SavePreferences(userId, categoryIds);
+            if (User.Identity.IsAuthenticated)
+            {
+                int userId = _userService.GetUserId();
+                System.Diagnostics.Debug.WriteLine($"Saving preferences for UserId: {userId}");
+                _userPreferenceService.SavePreferences(userId, categoryIds);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("User is not authenticated");
+            }
+
             return RedirectToAction("Confirmation", "Preference");
         }
-
 
         public IActionResult Confirmation()
         {

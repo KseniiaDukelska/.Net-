@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Rocky_Models.Models;
 using Rocky_DataAccess.Repository.IRepository;
-using Rocky_DataAccess.Repository;
 
 namespace Rocky.Services
 {

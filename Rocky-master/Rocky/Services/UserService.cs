@@ -25,12 +25,11 @@ namespace Rocky.Services
 
             if (isUserExist != null)
             {
-                throw new Exception("User with this email or user name already exist");
+                throw new Exception("User with this email or user name already exists");
             }
 
             _repository.Add(user);
             _repository.Save();
-
 
             await Authenticate(user);
         }
@@ -45,72 +44,54 @@ namespace Rocky.Services
             return Task.Run(() =>
             {
                 _accessor.HttpContext.Response.Cookies.Delete(WC.UserCookie);
+                _accessor.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             });
         }
 
         public bool IsUserSignedIn()
         {
-            return _accessor.HttpContext.Request.Cookies.ContainsKey(WC.UserCookie);
+            return _accessor.HttpContext.User.Identity.IsAuthenticated;
         }
 
         public string GetUserName()
         {
-            var claims = GetUserClaimsFromCookie();
-
-            var userName = claims.First(c => c.Key == ClaimsIdentity.DefaultNameClaimType).Value;
-
-            return userName;
+            return _accessor.HttpContext.User.Identity.Name;
         }
 
         public bool IsInRole(string roleName)
         {
-            try
-            {
-                var claims = GetUserClaimsFromCookie();
-
-                var isInRole = claims.Any(c => c.Key == ClaimsIdentity.DefaultRoleClaimType && c.Value == roleName);
-
-                return isInRole;
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return false;
-            }
+            return _accessor.HttpContext.User.IsInRole(roleName);
         }
 
         public int GetUserId()
         {
-            var claims = GetUserClaimsFromCookie();
-            var userId = Int32.Parse(claims.First(c => c.Key == ClaimTypes.NameIdentifier).Value);
-            return userId;
-        }
+            var userIdClaim = _accessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdClaim == null)
+            {
+                throw new UnauthorizedAccessException("User ID claim not found.");
+            }
 
+            return int.Parse(userIdClaim);
+        }
 
         private async Task Authenticate(ApplicationUser user)
         {
-            var claims = new Dictionary<string, string>()
+            var claims = new List<Claim>
             {
-                { ClaimsIdentity.DefaultNameClaimType, user.UserName },
-                { ClaimsIdentity.DefaultRoleClaimType, user.Role.RoleName },
-                { ClaimTypes.NameIdentifier, user.Id.ToString() }
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Role, user.Role.RoleName),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
-            var jsonClaims = JsonConvert.SerializeObject(claims);
-
-            _accessor.HttpContext.Response.Cookies.Append(WC.UserCookie, jsonClaims, new CookieOptions
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
             {
-                Expires = (DateTimeOffset.Now.AddDays(2))
-            });
-        }
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(1)
+            };
 
-        private Dictionary<string, string> GetUserClaimsFromCookie()
-        {
-           _accessor.HttpContext.Request.Cookies.TryGetValue(WC.UserCookie, out string jsonClaims);
-
-            if (string.IsNullOrEmpty(jsonClaims))
-                throw new UnauthorizedAccessException("User unauthorized");
-
-            return JsonConvert.DeserializeObject<Dictionary<string, string>>(jsonClaims);
+            await _accessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity), authProperties);
         }
     }
 }
