@@ -7,27 +7,51 @@ using Rocky_DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Rocky.Infrastructure;
 using Rocky.Services;
+using Microsoft.Extensions.Hosting;
+
 
 namespace Rocky.Controllers
 {
     [OwnAuthorize(WC.AdminRole)]
     public class ProductController : Controller
     {
+
         private readonly IProductRepository _productRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ILikeRepository _likeRepository;
+        private readonly IUserService _userService;
         private readonly IUserInteractionService _userInteractionService;
 
-        public ProductController(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment)
+        public ProductController(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment, 
+            ILikeRepository likeRepository, IUserService userService, IUserInteractionService userInteractionService)
         {
             _productRepository = productRepository;
             _webHostEnvironment = webHostEnvironment;
+            _likeRepository = likeRepository;
+            _userService = userService;
+            _userInteractionService = userInteractionService;
         }
 
         public IActionResult Index()
         {
-            IEnumerable<Product> products = _productRepository.GetAll(includeProperties: "Category");
+            var products = _productRepository.GetAll(includeProperties: "Category")
+                .Select(product => new Product
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    ShortDesc = product.ShortDesc,
+                    Price = product.Price,
+                    Image = product.Image,
+                    Category = product.Category,
+                    TempSqFt = product.TempSqFt,
+                    EventTime = product.EventTime,
+                    Place = product.Place,
+                    Count = _likeRepository.GetAll(x => x.ProductId == product.Id).Count(),
+                }).ToList();
 
             return View(products);
+
         }
 
         public IActionResult Upsert(int? id)
@@ -175,5 +199,41 @@ namespace Rocky.Controllers
 
             return View(product);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Like(int Id)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
+
+            var userId = _userService.GetUserId();
+            var existing = _likeRepository.FirstOrDefault(x => x.ApplicationUserId == userId && x.ProductId == Id);
+
+            if (existing != null)
+            {
+                _likeRepository.Remove(existing);
+            }
+            else
+            {
+                var like = new Like()
+                {
+                    ApplicationUserId = userId,
+                    ProductId = Id
+                };
+
+                _likeRepository.Add(like);
+            }
+
+            _likeRepository.Save();
+
+            System.Diagnostics.Debug.WriteLine($"User {userId} liked product {Id}");
+
+
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
     }
 }

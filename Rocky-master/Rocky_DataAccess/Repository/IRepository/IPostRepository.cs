@@ -1,9 +1,9 @@
-﻿using Rocky_Models.Models;
+﻿//using Rocky_Models.Models;
 
-namespace Rocky_DataAccess.Repository.IRepository
-{
-    public interface IPostRepository : IRepository<Post>
-    {
-        void Update(Post post);
-    }
-}
+//namespace Rocky_DataAccess.Repository.IRepository
+//{
+//    public interface IPostRepository : IRepository<Post>
+//    {
+//        void Update(Post post);
+//    }
+//}

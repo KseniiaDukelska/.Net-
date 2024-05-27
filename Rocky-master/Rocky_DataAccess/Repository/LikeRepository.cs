@@ -16,5 +16,6 @@ namespace Rocky_DataAccess.Repository
         {
             _db.Likes.Update(like);
         }
+
     }
 }

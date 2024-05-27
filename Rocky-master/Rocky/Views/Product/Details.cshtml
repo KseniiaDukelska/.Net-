@@ -1,0 +1,46 @@
+﻿@* @model Rocky_Models.Models.Product
+@using Rocky_Utility;
+@using Rocky.Services;
+@inject IUserService _userService
+<link href="~/css/blog.css" rel="stylesheet" />
+
+<div class="product-container">
+    <div class="product-content">
+        <div class="product-image">
+            <img src="@WC.ImagePath@Model.Image" alt="Product Image">
+        </div>
+        <div class="product-text">
+            <h2 class="product-title">@Model.Name</h2>
+            <div>@Model.ShortDesc</div>
+        </div>
+    </div>
+    <div class="product-info">
+        <span class="product-price">Price: @Model.Price.ToString("C")</span>
+        <span class="product-category">Category: @Model.Category.Name</span>
+        <span class="product-date">Event Time: @Model.EventTime</span>
+        <span class="product-place">Place: @Model.Place</span>
+    </div>
+    <div class="product-actions">
+        <span class="like-count">Like Count: @Model.Count</span>
+        <form method="post" action="@Url.Action("Like", "Product")">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="productId" value="@Model.Id" />
+            <button type="submit" class="like-button">
+                <i class="like-icon fas fa-heart"></i>
+            </button>
+        </form>
+        @if (_userService.IsInRole(WC.AdminRole))
+        {
+            <a asp-controller="Product" asp-action="Edit" asp-route-Id="@Model.Id" class="btn btn-primary mx-2">
+                <i class="fas fa-edit"></i>
+            </a>
+            <a asp-controller="Product" asp-action="Delete" asp-route-Id="@Model.Id" class="btn btn-danger mx-2">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        }
+    </div>
+    <div class="main-text">
+        @Html.Raw(Model.Description)
+    </div>
+</div>
+ *@

@@ -55,7 +55,6 @@ namespace Rocky
             services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
             services.AddScoped<IOrderHeaderRepository, OrderHeaderRepository>();
             services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
-            services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<ILikeRepository, LikeRepository>();
             services.AddScoped<IUserPreferenceRepository, UserPreferenceRepository>();
 
@@ -89,14 +88,11 @@ namespace Rocky
             app.UseSession();
 
             app.UseEndpoints(endpoints =>
-            {   
+            {
                 endpoints.MapRazorPages();
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-                // Add this line to map API controllers
-                endpoints.MapControllers();
             });
         }
     }

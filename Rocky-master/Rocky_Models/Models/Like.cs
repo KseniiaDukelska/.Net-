@@ -13,9 +13,11 @@ namespace Rocky_Models.Models
         [ForeignKey("ApplicationUserId")]
         public ApplicationUser ApplicationUser { get; set; }
 
-        public int PostId { get; set; }
-        [ForeignKey("PostId")]
-        public Post Post { get; set; }
+ 
+        public int ProductId { get; set; }
+        [ForeignKey("ProductId")]
+
+        public Product Product { get; set; }
 
     }
 }

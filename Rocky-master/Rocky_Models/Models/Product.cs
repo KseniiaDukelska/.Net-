@@ -39,5 +39,10 @@ namespace Rocky_Models.Models
 
         [Display(Name = "Place")]
         public string Place { get; set; }
+
+        public List<Like> Likes { get; set; }
+
+        [NotMapped]
+        public int Count { get; set; }
     }
 }
