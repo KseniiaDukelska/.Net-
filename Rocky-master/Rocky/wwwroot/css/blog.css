@@ -3,7 +3,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s;
     border: none;
-    border-radius: 10px;
+    border-radius: 30px;
     overflow: hidden;
 }
 
@@ -14,8 +14,6 @@
 .card-img-top {
     height: 200px;
     object-fit: cover;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
 }
 
 .card-body {

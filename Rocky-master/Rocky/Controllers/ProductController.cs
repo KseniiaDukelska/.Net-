@@ -45,7 +45,8 @@ namespace Rocky.Controllers
                     Image = product.Image,
                     Category = product.Category,
                     TempSqFt = product.TempSqFt,
-                    EventTime = product.EventTime,
+                    EndTime = product.EndTime,
+                    StartTime = product.StartTime,
                     Place = product.Place,
                     Count = _likeRepository.GetAll(x => x.ProductId == product.Id).Count(),
                 }).ToList();
@@ -204,11 +205,6 @@ namespace Rocky.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Like(int Id)
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Unauthorized();
-            }
-
             var userId = _userService.GetUserId();
             var existing = _likeRepository.FirstOrDefault(x => x.ApplicationUserId == userId && x.ProductId == Id);
 

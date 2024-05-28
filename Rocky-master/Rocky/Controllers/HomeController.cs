@@ -4,6 +4,7 @@ using Rocky_Models.ViewModels;
 using Rocky_Utility;
 using Rocky_DataAccess.Repository.IRepository;
 using Rocky.Services;
+using Rocky_DataAccess.Repository;
 
 namespace Rocky.Controllers
 {
@@ -14,22 +15,39 @@ namespace Rocky.Controllers
         private readonly ICategoryRepository _categoryRepository;
         private readonly IUserService _userService;
         private readonly IUserPreferenceService _userPreferenceService;
+        private readonly ILikeRepository _likeRepository;
+
 
         public HomeController(ILogger<HomeController> logger, IProductRepository productRepository, ICategoryRepository categoryRepository, IUserService userService,
-            IUserPreferenceService userPreferenceService)
+            IUserPreferenceService userPreferenceService, ILikeRepository likeRepository)
         {
             _logger = logger;
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
             _userService = userService;
             _userPreferenceService = userPreferenceService;
+            _likeRepository = likeRepository;
         }
 
         public IActionResult Index()
         {
             HomeVM homeVm = new HomeVM()
             {
-                Products = _productRepository.GetAll(includeProperties: "Category"),
+                Products = _productRepository.GetAll(includeProperties: "Category").Select(product => new Product
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    ShortDesc = product.ShortDesc,
+                    Price = product.Price,
+                    Image = product.Image,
+                    Category = product.Category,
+                    TempSqFt = product.TempSqFt,
+                    EndTime = product.EndTime,
+                    StartTime = product.StartTime,
+                    Place = product.Place,
+                    Count = _likeRepository.GetAll(x => x.ProductId == product.Id).Count(),
+                }).ToList(),
                 Categories = _categoryRepository.GetAll()
             };
 

@@ -31,17 +31,9 @@ namespace Rocky.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult SavePreferences(List<int> categoryIds)
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                int userId = _userService.GetUserId();
-                System.Diagnostics.Debug.WriteLine($"Saving preferences for UserId: {userId} with Categories: {string.Join(", ", categoryIds)}");
-                _userPreferenceService.SavePreferences(userId, categoryIds);
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("User is not authenticated");
-            }
-
+            int userId = _userService.GetUserId();
+            System.Diagnostics.Debug.WriteLine($"Saving preferences for UserId: {userId} with Categories: {string.Join(", ", categoryIds)}");
+            _userPreferenceService.SavePreferences(userId, categoryIds);
             return RedirectToAction("Confirmation", "Preference");
         }
 

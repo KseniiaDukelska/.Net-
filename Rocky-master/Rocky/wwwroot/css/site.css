@@ -60,7 +60,7 @@ html {
 body {
     /* Margin bottom by footer height */
    /* margin-bottom: 60px;*/
-    background: url('/images/dust_scratches.png');
+    background: #fff;
 }
 
 .footer {
@@ -236,3 +236,18 @@ body {
     margin: 0 auto;
 }
 
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.card {
+
+    border-radius: 30px;
+}
+
+.btn {
+    border-radius: .8rem;
+}

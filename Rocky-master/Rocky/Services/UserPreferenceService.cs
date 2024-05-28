@@ -22,6 +22,8 @@ namespace Rocky.Services
 
         public void SavePreferences(int userId, List<int> categoryIds)
         {
+            System.Diagnostics.Debug.WriteLine($"Error categoryIds: {categoryIds} ");
+
             try
             {
                 var existingPreferences = _db.UserPreferences.Where(up => up.UserId == userId);
@@ -38,6 +40,7 @@ namespace Rocky.Services
 
                 _db.SaveChanges();
             }
+
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error saving preferences: {ex.Message}");

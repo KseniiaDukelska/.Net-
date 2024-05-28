@@ -34,8 +34,11 @@ namespace Rocky_Models.Models
         public Category Category { get; set; }
 
         // New properties
-        [Display(Name = "Event Time")]
-        public DateTime EventTime { get; set; }
+        [Display(Name = "Start Time")]
+        public DateTime StartTime { get; set; }
+
+        [Display(Name = "End Time")]
+        public DateTime? EndTime { get; set; }
 
         [Display(Name = "Place")]
         public string Place { get; set; }

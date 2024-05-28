@@ -1,31 +1,44 @@
 ﻿@model Rocky_Models.Models.Product
 @using Rocky_Utility
+@using System.Globalization
 @inject Rocky.Services.IUserService _userService
 <link href="~/css/blog.css" rel="stylesheet" />
 
 <div class="col-lg-4 col-md-6 pb-4 filter @Model.Category.Name.Replace(' ','_')">
     <!-- Card-->
     <div class="card bg-white rounded shadow-sm" style="border:1px solid #222">
-        <div class="card-body px-3 pt-3 pb-1 row">
-            <div class="col-7"><label class="float-left">@Model.Name</label></div>
-            <div class="col-5"><label class="float-right"><span class="text-info h5">@string.Format("{0:c0}", Model.Price)</span></label> </div>
+        <div class="card-header bg-white">
+            <div class="row">
+                <div class="col-9">
+                    <h5 class="card-title">@Model.Name</h5>
+                </div>
+                <div class="col-3 text-right">
+                    <h5 class="text-info">@string.Format("{0:c0}", Model.Price)</h5>
+                </div>
+            </div>
         </div>
         <img class="card-img-top img-fluid d-block mx-auto mb-3" src="@WC.ImagePath@Model.Image" alt="Card image cap">
-        <div class="card-body p-1 px-3 row">
-            <div class="col-6">
-                <span class="badge p-2 border w-100 text-dark" style="background-color:lavenderblush">@Model.Category.Name</span>
+        <div class="card-body p-1 px-3">
+            <div class="col-12 mb-2">
+                <span class="badge p-2 border w-100 text-dark" style="font-size:16px; background-color:lavenderblush">@Model.Category.Name</span>
             </div>
-            <div class="col-6">
-                <span class="badge p-2  text-dark" style="font-size:13px; text-align:justify">@Model.EventTime</span>
+            <div class="col-12 mb-2">
+                <div class="badge bg-light text-dark p-3 w-100" style="font-size:14px; text-align:justify">
+                    <span>@Model.StartTime.ToString("ddd, dd MMM HH:mm", CultureInfo.InvariantCulture)</span>
+                    @if (Model.EndTime.HasValue)
+                    {
+                        <span> - @Model.EndTime.Value.ToString("HH:mm", CultureInfo.InvariantCulture)</span>
+                    }
+                </div>
             </div>
-            <div style="font-size:13px; text-align:justify">
-                <p>@Model.Place<p>
+            <div class="col-12 mb-2" style="font-size:13px; text-align:justify">
+                <p><strong>Place:</strong> @Model.Place</p>
             </div>
-            <div class="col-12 pt-2" style="font-size:13px; text-align:justify">
+            <div class="col-12 mb-2" style="font-size:13px; text-align:justify">
                 <p>@Model.ShortDesc</p>
             </div>
-            <div class="post-actions">
-                <span class="like-count">Like Count: @Model.Count</span>
+            <div class="post-actions mb-2">
+                <span class="like-count">@Model.Count</span>
                 <form method="post" action="@Url.Action("Like", "Product")">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="Id" value="@Model.Id" />
@@ -36,7 +49,7 @@
             </div>
             <div class="col-12 p-1">
                 <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-dark form-control btn-sm p-2" style="height:40px">View Details</a>
-            </div>        
+            </div>
         </div>
     </div>
 </div>

@@ -49,11 +49,20 @@
                 <!-- New fields for EventTime and Place -->
                 <div class="form-group row">
                     <div class="col-4">
-                        <label asp-for="Product.EventTime"></label>
+                        <label asp-for="Product.StartTime"></label>
                     </div>
                     <div class="col-8">
-                        <input asp-for="Product.EventTime" class="form-control" type="datetime-local" />
-                        <span asp-validation-for="Product.EventTime" class="text-danger"></span>
+                        <input asp-for="Product.StartTime" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="Product.StartTime" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-4">
+                        <label asp-for="Product.EndTime"></label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="Product.EndTime" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="Product.EndTime" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="form-group row">
