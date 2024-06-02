@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Rocky.Infrastructure;
+using Rocky.Services;
 using Rocky_DataAccess.Repository.IRepository;
 using Rocky_Models.Models;
 using Rocky_Models.ViewModels;
@@ -15,14 +16,20 @@ namespace Rocky.Controllers
     {
         private readonly IOrderHeaderRepository _orderHeaderRepository;
         private readonly IOrderDetailRepository _orderDetailRepository;
+        private readonly IUserInteractionService _userInteractionService;
+        private readonly IUserService _userService;
 
         [BindProperty]
         public OrderVM OrderVM { get; set; }
 
-        public OrderController(IOrderHeaderRepository orderHeaderRepository, IOrderDetailRepository orderDetailRepository)
+        public OrderController(IOrderHeaderRepository orderHeaderRepository, 
+            IOrderDetailRepository orderDetailRepository, 
+            IUserInteractionService userInteractionService, IUserService userService)
         {
             _orderHeaderRepository = orderHeaderRepository;
             _orderDetailRepository = orderDetailRepository;
+            _userInteractionService = userInteractionService;
+            _userService = userService;
         }
 
         public IActionResult Index(string searchName = null, string searchEmail = null, string searchPhone = null, string Status = null)
@@ -84,6 +91,10 @@ namespace Rocky.Controllers
             OrderHeader orderHeader = _orderHeaderRepository.FirstOrDefault(u => u.Id == OrderVM.OrderHeader.Id);
             orderHeader.OrderStatus = WC.StatusShipped;
             orderHeader.ShippingDate = DateTime.Now;
+
+            // Log the purchase interactions
+            LogPurchaseInteractions(orderHeader.Id);
+
             _orderHeaderRepository.Save();
             TempData[WC.Success] = "Order Shipped Successfully";
             return RedirectToAction(nameof(Index));
@@ -116,6 +127,25 @@ namespace Rocky.Controllers
             TempData[WC.Success] = "Order Details Updated Successfully";
 
             return RedirectToAction("Details", "Order", new { id = orderHeaderFromDb.Id });
+        }
+
+        // Log purchase interactions
+        private void LogPurchaseInteractions(int orderHeaderId)
+        {
+            var orderDetails = _orderDetailRepository.GetAll(od => od.OrderHeaderId == orderHeaderId, includeProperties: "Product");
+            var userId = _userService.GetUserId();
+
+            foreach (var detail in orderDetails)
+            {
+                var interaction = new UserInteraction
+                {
+                    UserId = userId,
+                    ProductId = detail.ProductId,
+                    InteractionType = "purchase",
+                    InteractionTime = DateTime.Now
+                };
+                _userInteractionService.LogInteraction(interaction);
+            }
         }
     }
 }

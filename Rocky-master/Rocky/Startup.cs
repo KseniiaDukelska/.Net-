@@ -57,11 +57,13 @@ namespace Rocky
             services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
             services.AddScoped<ILikeRepository, LikeRepository>();
             services.AddScoped<IUserPreferenceRepository, UserPreferenceRepository>();
+            services.AddScoped<IUserInteractionRepository, UserInteractionRepository>();
 
 
             // Register the new services
             services.AddScoped<IUserInteractionService, UserInteractionService>();
             services.AddScoped<IUserPreferenceService, UserPreferenceService>();
+            services.AddScoped<IProductRecommendationService, ProductRecommendationService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

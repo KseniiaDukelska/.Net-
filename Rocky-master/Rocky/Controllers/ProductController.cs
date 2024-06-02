@@ -21,20 +21,27 @@ namespace Rocky.Controllers
         private readonly ILikeRepository _likeRepository;
         private readonly IUserService _userService;
         private readonly IUserInteractionService _userInteractionService;
+        private readonly IProductRecommendationService _recommendationService;
 
         public ProductController(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment, 
-            ILikeRepository likeRepository, IUserService userService, IUserInteractionService userInteractionService)
+            ILikeRepository likeRepository, IUserService userService, IUserInteractionService userInteractionService, IProductRecommendationService recommendationService)
         {
             _productRepository = productRepository;
             _webHostEnvironment = webHostEnvironment;
             _likeRepository = likeRepository;
             _userService = userService;
             _userInteractionService = userInteractionService;
+            _recommendationService = recommendationService;
         }
 
         public IActionResult Index()
         {
-            var products = _productRepository.GetAll(includeProperties: "Category")
+            var userId = _userService.GetUserId();
+            var recommendedProducts = _recommendationService.GetRecommendedProducts(userId);
+            var allProducts = _productRepository.GetAll(includeProperties: "Category");
+
+            var products = recommendedProducts
+                .Concat(allProducts.Where(p => !recommendedProducts.Contains(p)))
                 .Select(product => new Product
                 {
                     Id = product.Id,
@@ -52,7 +59,6 @@ namespace Rocky.Controllers
                 }).ToList();
 
             return View(products);
-
         }
 
         public IActionResult Upsert(int? id)
@@ -189,20 +195,10 @@ namespace Rocky.Controllers
                 return NotFound();
             }
 
-            // Log the interaction
-            var interaction = new UserInteraction
-            {
-                UserId = User.GetUserId(), // Assuming you have a method to get the current user's ID
-                ProductId = product.Id,
-                InteractionType = "view"
-            };
-            _userInteractionService.LogInteraction(interaction);
-
             return View(product);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [OwnAuthorize()]
         public IActionResult Like(int Id)
         {
             var userId = _userService.GetUserId();
@@ -221,6 +217,16 @@ namespace Rocky.Controllers
                 };
 
                 _likeRepository.Add(like);
+
+                // Log the interaction
+                var interaction = new UserInteraction
+                {
+                    UserId = userId,
+                    ProductId = Id,
+                    InteractionType = "like",
+                    InteractionTime = DateTime.Now,
+                };
+                _userInteractionService.LogInteraction(interaction);
             }
 
             _likeRepository.Save();

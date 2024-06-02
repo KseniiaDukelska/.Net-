@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Rocky_Models.Models
 {
@@ -12,19 +9,23 @@ namespace Rocky_Models.Models
         [Key]
         public int InteractionId { get; set; }
 
-        [Required]
         public int UserId { get; set; }
 
-        [Required]
+        [ForeignKey("UserId")]
+        public ApplicationUser User { get; set; }
+
         public int ProductId { get; set; }
+
+        [ForeignKey("ProductId")]
+        public Product Product { get; set; }
 
         [Required]
         [StringLength(50)]
         public string InteractionType { get; set; }
 
-        public float? InteractionValue { get; set; } // Optional, e.g., for ratings
+        public float? InteractionValue { get; set; }
 
-        [Required]
-        public DateTime InteractionTime { get; set; } = DateTime.Now;
+        public DateTime InteractionTime { get; set; }
     }
 }
+

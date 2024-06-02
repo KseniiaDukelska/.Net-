@@ -17,10 +17,20 @@
                 </div>
             </div>
         </div>
-        <img class="card-img-top img-fluid d-block mx-auto mb-3" src="@WC.ImagePath@Model.Image" alt="Card image cap">
+        <img class="card-img-top img-fluid d-block mx-auto mb-1" src="@WC.ImagePath@Model.Image" alt="Card image cap">
+        <div class="post-actions">
+            <span class="like-count">@Model.Count</span>
+            <form method="post" action="@Url.Action("Like", "Product")">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <button type="submit" class="like-button">
+                    <i class="like-icon fas fa-heart"></i>
+                </button>
+            </form>
+        </div>
         <div class="card-body p-1 px-3">
             <div class="col-12 mb-2">
-                <span class="badge p-2 border w-100 text-dark" style="font-size:16px; background-color:lavenderblush">@Model.Category.Name</span>
+                <span class="badge p-2 border w-100 text-dark" style="font-size:16px; background-color:@Model.Category.Color">@Model.Category.Name</span>
             </div>
             <div class="col-12 mb-2">
                 <div class="badge bg-light text-dark p-3 w-100" style="font-size:14px; text-align:justify">
@@ -36,16 +46,6 @@
             </div>
             <div class="col-12 mb-2" style="font-size:13px; text-align:justify">
                 <p>@Model.ShortDesc</p>
-            </div>
-            <div class="post-actions mb-2">
-                <span class="like-count">@Model.Count</span>
-                <form method="post" action="@Url.Action("Like", "Product")">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="Id" value="@Model.Id" />
-                    <button type="submit" class="like-button">
-                        <i class="like-icon fas fa-heart"></i>
-                    </button>
-                </form>
             </div>
             <div class="col-12 p-1">
                 <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-dark form-control btn-sm p-2" style="height:40px">View Details</a>

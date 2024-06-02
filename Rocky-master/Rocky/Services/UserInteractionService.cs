@@ -1,21 +1,27 @@
 ﻿using Rocky_DataAccess;
+using Rocky_DataAccess.Repository.IRepository;
 using Rocky_Models.Models;
 
 namespace Rocky.Services
 {
     public class UserInteractionService : IUserInteractionService
     {
-        private readonly ApplicationDbContext _db;
+        private readonly IUserInteractionRepository _userInteractionRepository;
 
-        public UserInteractionService(ApplicationDbContext db)
+        public UserInteractionService(IUserInteractionRepository userInteractionRepository)
         {
-            _db = db;
+            _userInteractionRepository = userInteractionRepository;
         }
 
         public void LogInteraction(UserInteraction interaction)
         {
-            _db.UserInteractions.Add(interaction);
-            _db.SaveChanges();
+            _userInteractionRepository.Add(interaction);
+            _userInteractionRepository.Save();
+        }
+
+        public IEnumerable<UserInteraction> GetUserInteractions(int userId)
+        {
+            return _userInteractionRepository.GetAll(ui => ui.UserId == userId).ToList();
         }
     }
 }

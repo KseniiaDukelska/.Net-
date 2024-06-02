@@ -21,6 +21,7 @@ namespace Rocky_DataAccess.Repository
             {
                 objFromDb.Name = category.Name;
                 objFromDb.DisplayOrder = category.DisplayOrder;
+                objFromDb.Color = category.Color;
             }
        }
     }

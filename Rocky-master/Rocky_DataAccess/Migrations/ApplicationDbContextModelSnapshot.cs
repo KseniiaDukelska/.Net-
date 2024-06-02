@@ -68,6 +68,10 @@ namespace Rocky_DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("DisplayOrder")
                         .HasColumnType("int");
 
@@ -315,36 +319,6 @@ namespace Rocky_DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Role");
-                });
-
-            modelBuilder.Entity("Rocky_Models.Models.UserInteraction", b =>
-                {
-                    b.Property<int>("InteractionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InteractionId"));
-
-                    b.Property<DateTime>("InteractionTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("InteractionType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<float?>("InteractionValue")
-                        .HasColumnType("real");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("InteractionId");
-
-                    b.ToTable("UserInteractions");
                 });
 
             modelBuilder.Entity("Rocky_Models.Models.UserPreference", b =>

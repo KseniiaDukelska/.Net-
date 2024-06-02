@@ -59,8 +59,8 @@ html {
 
 body {
     /* Margin bottom by footer height */
-   /* margin-bottom: 60px;*/
-    background: #fff;
+    /* margin-bottom: 60px; url(/images/background-pic.png)*/
+    background:#fff;
 }
 
 .footer {
@@ -251,3 +251,31 @@ body {
 .btn {
     border-radius: .8rem;
 }
+
+.search-container {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.search-input {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    outline: none;
+    font-size: 16px;
+}
+
+.search-button {
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    margin-left: -40px;
+}
+
+    .search-button i {
+        font-size: 20px;
+        color: #333;
+    }
