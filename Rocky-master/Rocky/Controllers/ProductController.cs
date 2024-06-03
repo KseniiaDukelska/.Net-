@@ -21,27 +21,21 @@ namespace Rocky.Controllers
         private readonly ILikeRepository _likeRepository;
         private readonly IUserService _userService;
         private readonly IUserInteractionService _userInteractionService;
-        private readonly IProductRecommendationService _recommendationService;
 
         public ProductController(IProductRepository productRepository, IWebHostEnvironment webHostEnvironment, 
-            ILikeRepository likeRepository, IUserService userService, IUserInteractionService userInteractionService, IProductRecommendationService recommendationService)
+            ILikeRepository likeRepository, IUserService userService, IUserInteractionService userInteractionService)
         {
             _productRepository = productRepository;
             _webHostEnvironment = webHostEnvironment;
             _likeRepository = likeRepository;
             _userService = userService;
             _userInteractionService = userInteractionService;
-            _recommendationService = recommendationService;
         }
 
         public IActionResult Index()
         {
             var userId = _userService.GetUserId();
-            var recommendedProducts = _recommendationService.GetRecommendedProducts(userId);
-            var allProducts = _productRepository.GetAll(includeProperties: "Category");
-
-            var products = recommendedProducts
-                .Concat(allProducts.Where(p => !recommendedProducts.Contains(p)))
+            var products = _productRepository.GetAll(includeProperties: "Category")
                 .Select(product => new Product
                 {
                     Id = product.Id,
@@ -224,6 +218,7 @@ namespace Rocky.Controllers
                     UserId = userId,
                     ProductId = Id,
                     InteractionType = "like",
+                    InteractionValue = 5,
                     InteractionTime = DateTime.Now,
                 };
                 _userInteractionService.LogInteraction(interaction);

@@ -5,6 +5,7 @@ using Rocky_Utility;
 using Rocky_DataAccess.Repository.IRepository;
 using Rocky.Services;
 using Rocky_DataAccess.Repository;
+using System.Linq;
 
 namespace Rocky.Controllers
 {
@@ -16,10 +17,10 @@ namespace Rocky.Controllers
         private readonly IUserService _userService;
         private readonly IUserPreferenceService _userPreferenceService;
         private readonly ILikeRepository _likeRepository;
-
+        private readonly MLModelPredictionService _predictionService;
 
         public HomeController(ILogger<HomeController> logger, IProductRepository productRepository, ICategoryRepository categoryRepository, IUserService userService,
-            IUserPreferenceService userPreferenceService, ILikeRepository likeRepository)
+            IUserPreferenceService userPreferenceService, ILikeRepository likeRepository, MLModelPredictionService predictionService)
         {
             _logger = logger;
             _productRepository = productRepository;
@@ -27,13 +28,44 @@ namespace Rocky.Controllers
             _userService = userService;
             _userPreferenceService = userPreferenceService;
             _likeRepository = likeRepository;
+            _predictionService = predictionService;
         }
 
         public IActionResult Index()
         {
+            var products = _productRepository.GetAll(includeProperties: "Category").ToList();
+            var reorderedProducts = products;
+            var categories = _categoryRepository.GetAll().OrderBy(c => c.DisplayOrder).ToList();
+            var reorderedCategories = categories;
+
+            if (_userService.IsUserSignedIn())
+            {
+                int userId = _userService.GetUserId(); // Use the extension method to get the current user's ID
+                var preferredCategoryIds = _userPreferenceService.GetUserPreferences(userId);
+
+                var scoredProducts = products.Select(product => new
+                {
+                    Product = product,
+                    Score = _predictionService.Predict(new MLModelInput
+                    {
+                        UserId = userId,
+                        ProductId = product.Id // Assuming Product entity has Id property
+                    }).Score
+                })
+                .OrderByDescending(r => r.Score)
+                .ToList();
+
+                foreach (var scoredProduct in scoredProducts)
+                {
+                    _logger.LogInformation($"Product: {scoredProduct.Product.Name}, Score: {scoredProduct.Score}");
+                }
+
+                reorderedProducts = scoredProducts.Select(r => r.Product).ToList();
+            }
+
             HomeVM homeVm = new HomeVM()
             {
-                Products = _productRepository.GetAll(includeProperties: "Category").Select(product => new Product
+                Products = reorderedProducts.Select(product => new Product
                 {
                     Id = product.Id,
                     Name = product.Name,
@@ -50,12 +82,6 @@ namespace Rocky.Controllers
                 }).ToList(),
                 Categories = _categoryRepository.GetAll()
             };
-
-            if (User.Identity.IsAuthenticated)
-            {
-                var userId = User.GetUserId(); // Use the extension method to get the current user's ID
-                homeVm.UserPreferences = _userPreferenceService.GetUserPreferences(userId);
-            }
 
             return View(homeVm);
         }

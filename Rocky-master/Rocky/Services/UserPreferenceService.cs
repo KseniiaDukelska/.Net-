@@ -41,6 +41,7 @@ namespace Rocky.Services
                 _db.SaveChanges();
             }
 
+
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error saving preferences: {ex.Message}");

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.ML;
 using Microsoft.IdentityModel.Tokens;
 using Rocky.Services;
 using Rocky_DataAccess;
@@ -63,7 +64,13 @@ namespace Rocky
             // Register the new services
             services.AddScoped<IUserInteractionService, UserInteractionService>();
             services.AddScoped<IUserPreferenceService, UserPreferenceService>();
-            services.AddScoped<IProductRecommendationService, ProductRecommendationService>();
+
+            // Register the PredictionEnginePool
+            services.AddPredictionEnginePool<MLModelInput, MLModelOutput>()
+                    .FromFile("C:\\Users\\kseni\\Downloads\\Rocky-master\\Rocky-master\\MLModel_WebApi2\\MLModel.mlnet");
+
+            // Register MLModelPredictionService
+            services.AddSingleton<MLModelPredictionService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

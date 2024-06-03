@@ -62,8 +62,8 @@
         "Version": 1,
         "Type": "Trial",
         "TrainerName": "MatrixFactorization",
-        "Score": -24.370155986634565,
-        "RuntimeInSeconds": 0.509,
+        "Score": -25.216979886983744,
+        "RuntimeInSeconds": 5.698,
         "Parameter": {
           "_SCHEMA_": "e0 * e1 * e2 * e3 * e4",
           "e0": {
@@ -80,9 +80,9 @@
             "LabelColumnName": "InteractionValue",
             "MatrixColumnIndexColumnName": "UserId",
             "MatrixRowIndexColumnName": "ProductId",
-            "ApproximationRank": 76,
-            "LearningRate": 0.023981093574823451,
-            "NumberOfIterations": 106,
+            "ApproximationRank": 108,
+            "LearningRate": 0.0036823041221451195,
+            "NumberOfIterations": 784,
             "Quiet": true
           },
           "e3": {
@@ -99,8 +99,8 @@
         "Version": 1,
         "Type": "Trial",
         "TrainerName": "MatrixFactorization",
-        "Score": -24.925353880934495,
-        "RuntimeInSeconds": 3.743,
+        "Score": -25.374230297639571,
+        "RuntimeInSeconds": 0.949,
         "Parameter": {
           "_SCHEMA_": "e0 * e1 * e2 * e3 * e4",
           "e0": {
@@ -117,9 +117,9 @@
             "LabelColumnName": "InteractionValue",
             "MatrixColumnIndexColumnName": "UserId",
             "MatrixRowIndexColumnName": "ProductId",
-            "ApproximationRank": 868,
-            "LearningRate": 0.0053442625841249947,
-            "NumberOfIterations": 641,
+            "ApproximationRank": 10,
+            "LearningRate": 0.0084828229007777537,
+            "NumberOfIterations": 111,
             "Quiet": true
           },
           "e3": {
@@ -136,8 +136,8 @@
         "Version": 1,
         "Type": "Trial",
         "TrainerName": "MatrixFactorization",
-        "Score": -35969.722944722926,
-        "RuntimeInSeconds": 0.173,
+        "Score": -3059.5990027945963,
+        "RuntimeInSeconds": 0.232,
         "Parameter": {
           "_SCHEMA_": "e0 * e1 * e2 * e3 * e4",
           "e0": {
@@ -154,9 +154,46 @@
             "LabelColumnName": "InteractionValue",
             "MatrixColumnIndexColumnName": "UserId",
             "MatrixRowIndexColumnName": "ProductId",
-            "ApproximationRank": 123,
-            "LearningRate": 2.1705386859348107E-05,
-            "NumberOfIterations": 20,
+            "ApproximationRank": 10,
+            "LearningRate": 2.2957705590221539E-05,
+            "NumberOfIterations": 11,
+            "Quiet": true
+          },
+          "e3": {
+            "OutputColumnName": "UserId",
+            "InputColumnName": "UserId"
+          },
+          "e4": {
+            "OutputColumnName": "ProductId",
+            "InputColumnName": "ProductId"
+          }
+        }
+      },
+      {
+        "Version": 1,
+        "Type": "Trial",
+        "TrainerName": "MatrixFactorization",
+        "Score": -1243325.7870680122,
+        "RuntimeInSeconds": 84.689,
+        "Parameter": {
+          "_SCHEMA_": "e0 * e1 * e2 * e3 * e4",
+          "e0": {
+            "OutputColumnName": "ProductId",
+            "InputColumnName": "ProductId",
+            "AddKeyValueAnnotationsAsText": false
+          },
+          "e1": {
+            "OutputColumnName": "UserId",
+            "InputColumnName": "UserId",
+            "AddKeyValueAnnotationsAsText": false
+          },
+          "e2": {
+            "LabelColumnName": "InteractionValue",
+            "MatrixColumnIndexColumnName": "UserId",
+            "MatrixRowIndexColumnName": "ProductId",
+            "ApproximationRank": 5325,
+            "LearningRate": 1.6216685614570094E-05,
+            "NumberOfIterations": 2174,
             "Quiet": true
           },
           "e3": {
@@ -186,7 +223,7 @@
   "TrainingOption": {
     "Version": 1,
     "Type": "RecommendationTrainingOption",
-    "TrainingTime": 10,
+    "TrainingTime": 120,
     "LabelColumn": "InteractionValue",
     "UserIdColumn": "UserId",
     "ItemIdColumn": "ProductId",
