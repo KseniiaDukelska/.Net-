@@ -35,13 +35,28 @@ namespace Rocky.Controllers
         {
             var products = _productRepository.GetAll(includeProperties: "Category").ToList();
             var reorderedProducts = products;
-            var categories = _categoryRepository.GetAll().OrderBy(c => c.DisplayOrder).ToList();
-            var reorderedCategories = categories;
+            var categories = _categoryRepository.GetAll().ToList();
 
             if (_userService.IsUserSignedIn())
             {
                 int userId = _userService.GetUserId(); // Use the extension method to get the current user's ID
-                var preferredCategoryIds = _userPreferenceService.GetUserPreferences(userId);
+                var preferredCategoryIds = _userPreferenceService.GetPreferences(userId);
+
+                int order = 1;
+                foreach (var category in categories)
+                {
+                    if (preferredCategoryIds.Contains(category.Id))
+                    {
+                        category.DisplayOrder = order++;
+                    }
+                    else
+                    {
+                        category.DisplayOrder = order + 100; // Push non-preferred categories down the order
+                    }
+                }
+
+                // Sort categories by the updated DisplayOrder values
+                categories = categories.OrderBy(c => c.DisplayOrder).ToList();
 
                 var scoredProducts = products.Select(product => new
                 {
@@ -62,6 +77,11 @@ namespace Rocky.Controllers
 
                 reorderedProducts = scoredProducts.Select(r => r.Product).ToList();
             }
+            else
+            {
+                categories = categories.OrderBy(c => c.DisplayOrder).ToList(); // Ensure categories are ordered even when not logged in
+            }
+
 
             HomeVM homeVm = new HomeVM()
             {
@@ -80,7 +100,8 @@ namespace Rocky.Controllers
                     Place = product.Place,
                     Count = _likeRepository.GetAll(x => x.ProductId == product.Id).Count(),
                 }).ToList(),
-                Categories = _categoryRepository.GetAll()
+
+                Categories = categories
             };
 
             return View(homeVm);

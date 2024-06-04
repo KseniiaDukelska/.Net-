@@ -39,6 +39,24 @@ namespace Rocky.Services
                 }
 
                 _db.SaveChanges();
+
+                // Update DisplayOrder for categories
+                var allCategories = _categoryRepository.GetAll().ToList();
+                int displayOrder = 1;
+                foreach (var category in allCategories)
+                {
+                    if (categoryIds.Contains(category.Id))
+                    {
+                        category.DisplayOrder = displayOrder++;
+                    }
+                    else
+                    {
+                        category.DisplayOrder = displayOrder++;
+                    }
+                    _categoryRepository.Update(category);
+                }
+
+                _categoryRepository.Save();
             }
 
 
@@ -56,10 +74,14 @@ namespace Rocky.Services
 
         public List<int> GetPreferences(int userId)
         {
-            return _db.UserPreferences
-                      .Where(up => up.UserId == userId)
-                      .Select(up => up.CategoryId)
-                      .ToList();
+            //return _db.UserPreferences
+            //          .Where(up => up.UserId == userId)
+            //          .Select(up => up.CategoryId)
+            //          .ToList();
+
+            return _userPreferenceRepository.GetAll(up => up.UserId == userId)
+                                        .Select(up => up.CategoryId)
+                                        .ToList();
         }
 
         public List<Category> GetUserPreferences(int userId)
