@@ -26,7 +26,7 @@ namespace Rocky.Controllers
         private readonly MLModelPredictionService _predictionService;
         private readonly IHttpClientFactory _httpClientFactory;
 
-        private readonly string openAiApiKey = "sk-proj-YDFMosxMy0e6jzNR8MlqT3BlbkFJKlb5IOR9irkOW5Zbbkmr";
+        private readonly string openAiApiKey = "f";
 
         public HomeController(ILogger<HomeController> logger, 
             IProductRepository productRepository, 
