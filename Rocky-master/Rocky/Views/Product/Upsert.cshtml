@@ -67,6 +67,15 @@
                 </div>
                 <div class="form-group row">
                     <div class="col-4">
+                        <label asp-for="Product.AgeRestriction"></label>
+                    </div>
+                    <div class="col-8">
+                        <input asp-for="Product.AgeRestriction" class="form-control" />
+                        <span asp-validation-for="Product.AgeRestriction" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-4">
                         <label asp-for="Product.Place"></label>
                     </div>
                     <div class="col-8">

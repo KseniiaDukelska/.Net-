@@ -1,0 +1,8 @@
+﻿@model List<Rocky_Models.Models.Product>
+
+<div class="row">
+    @foreach (var prod in Model)
+    {
+        <partial name="_IndividualProductCard" model="prod" />
+    }
+</div>

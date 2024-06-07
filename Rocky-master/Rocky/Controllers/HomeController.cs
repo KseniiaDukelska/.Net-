@@ -6,6 +6,12 @@ using Rocky_DataAccess.Repository.IRepository;
 using Rocky.Services;
 using Rocky_DataAccess.Repository;
 using System.Linq;
+using Newtonsoft.Json;
+using System.Text;
+using Newtonsoft.Json.Linq;
+using System.Net.Http;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace Rocky.Controllers
 {
@@ -18,9 +24,17 @@ namespace Rocky.Controllers
         private readonly IUserPreferenceService _userPreferenceService;
         private readonly ILikeRepository _likeRepository;
         private readonly MLModelPredictionService _predictionService;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public HomeController(ILogger<HomeController> logger, IProductRepository productRepository, ICategoryRepository categoryRepository, IUserService userService,
-            IUserPreferenceService userPreferenceService, ILikeRepository likeRepository, MLModelPredictionService predictionService)
+        private readonly string openAiApiKey = "sk-proj-YDFMosxMy0e6jzNR8MlqT3BlbkFJKlb5IOR9irkOW5Zbbkmr";
+
+        public HomeController(ILogger<HomeController> logger, 
+            IProductRepository productRepository, 
+            ICategoryRepository categoryRepository, 
+            IUserService userService,
+            IUserPreferenceService userPreferenceService,
+            ILikeRepository likeRepository, 
+            MLModelPredictionService predictionService, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             _productRepository = productRepository;
@@ -29,6 +43,7 @@ namespace Rocky.Controllers
             _userPreferenceService = userPreferenceService;
             _likeRepository = likeRepository;
             _predictionService = predictionService;
+            _httpClientFactory = httpClientFactory;
         }
 
         public IActionResult Index()
@@ -98,6 +113,7 @@ namespace Rocky.Controllers
                     EndTime = product.EndTime,
                     StartTime = product.StartTime,
                     Place = product.Place,
+                    AgeRestriction = product.AgeRestriction,
                     Count = _likeRepository.GetAll(x => x.ProductId == product.Id).Count(),
                 }).ToList(),
 
@@ -178,5 +194,75 @@ namespace Rocky.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SearchEvents(string query)
+        {
+            string openAiResponse = await GetOpenAiResponse(query);
+            _logger.LogInformation($"OpenAI Response: {openAiResponse}");
+            var keywords = ExtractKeywordsFromOpenAiResponse(openAiResponse);
+            var events = FilterEventsByKeywords(keywords);
+            return PartialView("_SearchResults", events);
+        }
+
+        private async Task<string> GetOpenAiResponse(string query)
+        {
+            var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {openAiApiKey}");
+
+            var requestBody = new
+            {
+                model = "gpt-4",
+                messages = new[]
+                {
+                    new { role = "system", content = "You are an assistant that helps users find suitable events. Consider all event details such as name, description, start time, end time, place, category, price, and age restrictions. The query and event details are in Ukrainian. Return a list of keywords for filtering events based on the user's query." },
+                    new { role = "user", content = query }
+}
+            };
+
+            var response = await client.PostAsync(
+                "https://api.openai.com/v1/chat/completions",
+                new StringContent(JsonConvert.SerializeObject(requestBody), Encoding.UTF8, "application/json")
+            );
+
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+            dynamic responseObject = JObject.Parse(responseString);
+
+            return responseObject.choices[0].message.content;
+        }
+
+
+        private List<Product> FilterEventsByKeywords(List<string> keywords)
+        {
+            var allEvents = _productRepository.GetAll(includeProperties: "Category").ToList();
+            bool isAdultQuery = keywords.Contains("adult") || keywords.Contains("дорослих");
+            var events = allEvents
+                .Where(p =>
+                  (isAdultQuery ? p.AgeRestriction >= 18 : (!p.AgeRestriction.HasValue || p.AgeRestriction < 18)) && // Check age restriction
+                    keywords.Any(k =>
+                        p.Description.Contains(k, StringComparison.OrdinalIgnoreCase) ||
+                        p.Name.Contains(k, StringComparison.OrdinalIgnoreCase) ||
+                        p.Category.Name.Contains(k, StringComparison.OrdinalIgnoreCase) ||
+                        p.Place.Contains(k, StringComparison.OrdinalIgnoreCase) ||
+                        p.StartTime.ToString().Contains(k, StringComparison.OrdinalIgnoreCase) ||
+                        (p.EndTime.HasValue && p.EndTime.Value.ToString().Contains(k, StringComparison.OrdinalIgnoreCase))
+                    )
+                )
+                .ToList();
+
+            return events;
+        }
+
+        private List<string> ExtractKeywordsFromOpenAiResponse(string response)
+        {
+            // Assuming the response is a comma-separated list of keywords
+            var keywords = response.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                   .Select(k => k.Trim())
+                                   .ToList();
+            return keywords;
+        }
+
+
     }
 }

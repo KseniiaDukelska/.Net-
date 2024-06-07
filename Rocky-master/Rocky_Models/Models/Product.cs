@@ -47,5 +47,8 @@ namespace Rocky_Models.Models
 
         [NotMapped]
         public int Count { get; set; }
+
+        [Display(Name = "Age Restriction")]
+        public int? AgeRestriction { get; set; } // New property for age restriction
     }
 }

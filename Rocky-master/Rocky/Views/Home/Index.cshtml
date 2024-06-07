@@ -14,21 +14,26 @@
     <br />
 
     <div class="search-container">
-        <form asp-action="Search" method="get">
-            <input type="text" placeholder="Search" name="searchTerm" class="search-input">
+        <form id="search-form" asp-action="SearchEvents" method="post">
+            <input type="text" placeholder="Describe the event you want to find" name="query" class="search-input">
             <button type="submit" class="search-button">
                 <i class="fas fa-search"></i>
             </button>
         </form>
     </div>
-
     <br />
 
-    <div class="row">
-        @foreach (var prod in Model.Products)
-        {
-            <partial name="_IndividualProductCard" model="prod" />
-        }
+    <div id="loading" style="display:none; text-align:center;">
+        <img src="~/images/loading1.gif" alt="Loading..." />
+    </div>
+
+    <div id="search-results">
+        <div class="row">
+            @foreach (var prod in Model.Products)
+            {
+                <partial name="_IndividualProductCard" model="prod" />
+            }
+        </div>
     </div>
 </div>
 
@@ -38,7 +43,6 @@
         $(document).ready(function () {
 
             $(".filter-button").click(function () {
-
                 var value = $(this).attr('data-filter');
                 if (value == "all") {
                     $('.filter').show('1000');
@@ -49,6 +53,29 @@
                 }
             });
 
+            $('#search-form').submit(function (event) {
+                event.preventDefault();
+                var form = $(this);
+                var formData = form.serialize();
+
+                $('#loading').show();
+                $('#search-results').hide();
+
+                $.ajax({
+                    url: '@Url.Action("SearchEvents", "Home")', 
+                    method: 'POST',
+                    data: formData,
+                    success: function (result) {
+                        $('#loading').hide();
+                        $('#search-results').html(result).show();
+
+                    },
+                    error: function (xhr, status, error) {
+                        $('#loading').hide();
+                        alert('An error occurred while processing your request. Please try again.');
+                    }
+                });
+            });
         });
     </script>
 }

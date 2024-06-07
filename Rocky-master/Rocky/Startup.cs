@@ -71,6 +71,10 @@ namespace Rocky
 
             // Register MLModelPredictionService
             services.AddSingleton<MLModelPredictionService>();
+
+            // Register IHttpClientFactory
+            services.AddHttpClient();
+            services.AddControllersWithViews();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

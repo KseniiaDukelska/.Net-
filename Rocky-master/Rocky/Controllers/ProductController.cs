@@ -49,6 +49,7 @@ namespace Rocky.Controllers
                     EndTime = product.EndTime,
                     StartTime = product.StartTime,
                     Place = product.Place,
+                    AgeRestriction = product.AgeRestriction,
                     Count = _likeRepository.GetAll(x => x.ProductId == product.Id).Count(),
                 }).ToList();
 

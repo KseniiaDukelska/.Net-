@@ -47,6 +47,17 @@
             <div class="col-12 mb-2" style="font-size:13px; text-align:justify">
                 <p>@Model.ShortDesc</p>
             </div>
+            <div class="col-12 mb-2" style="font-size:13px; text-align:justify">
+                @if (Model.AgeRestriction.HasValue)
+                {
+                    <p><strong>Age Restriction:</strong> @Model.AgeRestriction+</p>
+                }
+                else
+                {
+                    <p><strong>Age Restriction:</strong> No Restriction </p>
+                }
+            </div>
+            
             <div class="col-12 p-1">
                 <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-dark form-control btn-sm p-2" style="height:40px">View Details</a>
             </div>
