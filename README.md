@@ -40,6 +40,11 @@ To install and set up Connectify on your local machine, follow these steps:
     ```
 2. Access the application in your web browser at `http://localhost:5000`.
 
+## Demo
+Watch the demo video below:
+
+<iframe src="https://drive.google.com/file/d/13wssIHiDhV94BjhIt58MSYKeL_ryMlIv/view?usp=sharing" width="640" height="480"></iframe>
+
 ## Technologies Used
 - **Programming Language**: C#
 - **Frameworks**: .NET Core, Entity Framework Core, ML.NET
@@ -48,4 +53,4 @@ To install and set up Connectify on your local machine, follow these steps:
   
 ## Contact
 For any inquiries or feedback, please contact:
-- **Ksenia Dukelskaya**: kseniaduk@gmail.com
+- **Ksenia Dukelska**: kseniaduk@gmail.com
