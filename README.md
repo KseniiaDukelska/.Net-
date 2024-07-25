@@ -41,8 +41,7 @@ To install and set up Connectify on your local machine, follow these steps:
 2. Access the application in your web browser at `http://localhost:5000`.
 
 ## Demo
-Watch the demo video below:
-(https://img.youtube.com/vi/4SbBj-cBQuM/0.jpg)](https://www.youtube.com/watch?v=4SbBj-cBQuM)
+[![Watch the video](https://img.youtube.com/vi/4SbBj-cBQuM/0.jpg)](https://www.youtube.com/watch?v=4SbBj-cBQuM)
 
 ## Technologies Used
 - **Programming Language**: C#
